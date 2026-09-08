@@ -5,6 +5,13 @@ import string
 from datetime import UTC, datetime
 
 
+def generate_password(length: int, digits: str, letters: str, punctuation: str) -> str:
+    """Generate a password using the selected character sets."""
+    return "".join(
+        secrets.choice(digits + letters + punctuation) for _ in range(length)
+    )
+
+
 def password_options() -> tuple[str, str, str]:
     """Prompt the user for password options and return them as a tuple."""
 
@@ -47,9 +54,7 @@ def password_generator() -> str | None:
         punctuation = string.punctuation
 
     print(f"Generating password of length {length}...")
-    password = "".join(
-        secrets.choice(digits + letters + punctuation) for _ in range(length)
-    )
+    password = generate_password(length, digits, letters, punctuation)
 
 
     file_name_counting = input("Filename ? default = password ") or "password"
