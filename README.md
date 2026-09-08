@@ -1,11 +1,11 @@
 # DevToolBox
 
-Gerador de passwords com React, Vite e shadcn/ui, servido por uma API FastAPI.
-A API gera uma password por pedido com `secrets`, usa o mesmo algoritmo do CLI em `backend/commands/password.py` e não guarda passwords em ficheiros ou base de dados. A UI mantém apenas o resultado atual em memória.
+A password generator built with React, Vite, and shadcn/ui, backed by a FastAPI API.
+The API generates one password per request using `secrets`, shares the CLI algorithm in `backend/commands/password.py`, and does not store passwords in files or a database. The UI keeps only the current result in memory.
 
-## Desenvolvimento
+## Development
 
-Requisitos: Python 3.14, uv, Node.js 24 e npm.
+Requirements: Python 3.14, uv, Node.js 24, and npm.
 
 ```sh
 cd backend
@@ -14,7 +14,7 @@ cd ../frontend/DevToolBox
 npm ci
 ```
 
-Na raiz, abrir dois terminais:
+From the project root, open two terminals:
 
 ```sh
 make backend
@@ -24,7 +24,7 @@ make backend
 make frontend
 ```
 
-Abrir http://localhost:5173. O Vite encaminha `/api` para o backend em `127.0.0.1:8000`, mantendo a mesma origem e dispensando CORS.
+Open http://localhost:5173. Vite proxies `/api` to the backend at `127.0.0.1:8000`, keeping requests on the same origin and avoiding the need for CORS configuration.
 Swagger: http://localhost:8000/docs.
 
 ## API
@@ -35,11 +35,11 @@ Swagger: http://localhost:8000/docs.
 {"length":16,"letters":true,"digits":true,"punctuation":true}
 ```
 
-Resposta: `{"password":"..."}` com `Cache-Control: no-store`.
-Comprimento máximo: 128. É obrigatório selecionar pelo menos um tipo e um comprimento entre 1 e 128. Os tipos escolhidos definem o conjunto de caracteres possíveis; não é garantida a presença de todos os tipos no resultado. Pedidos inválidos devolvem 422.
-`GET /api/health` devolve `{"status":"ok"}`.
+Response: `{"password":"..."}` with `Cache-Control: no-store`.
+Maximum length: 128. At least one character type must be selected, and the length must be between 1 and 128. Selected types define the pool of possible characters; the result is not guaranteed to contain every selected type. Invalid requests return 422.
+`GET /api/health` returns `{"status":"ok"}`.
 
-## Verificação
+## Verification
 
 ```sh
 make test
@@ -47,26 +47,26 @@ make check
 cd frontend/DevToolBox && npm run build
 ```
 
-## Docker Compose: dev e produção
+## Docker Compose: development and production
 
-Há dois serviços: `backend` (FastAPI) e `nginx` (serve o build do frontend e faz reverse proxy para a API). Em dev, o Nginx publica `127.0.0.1:80`. Em produção, nenhum serviço publica portas; só o Nginx participa na rede externa `vps-proxy`. O backend fica na rede própria do projeto.
+There are two services: `backend` (FastAPI) and `nginx` (serves the frontend build and acts as a reverse proxy for the API). In development, Nginx publishes `127.0.0.1:80`. In production, neither service publishes ports; only Nginx joins the external `vps-proxy` network. The backend stays on the project's own network.
 
-| Ambiente | Comando | Frontend | Swagger |
+| Environment | Command | Frontend | Swagger |
 | --- | --- | --- | --- |
-| Dev | `docker compose up -d --build` | http://localhost | http://localhost/docs |
-| Produção | `docker compose -p devtoolbox -f compose.prod.yaml up -d --build` | https://devtoolbox.pedrocrlx.pt após integração | Desativado (404) |
+| Development | `docker compose up -d --build` | http://localhost | http://localhost/docs |
+| Production | `docker compose -p devtoolbox -f compose.prod.yaml up -d --build` | https://devtoolbox.pedrocrlx.pt after integration | Disabled (404) |
 
-Em dev, http://localhost/openapi.json serve o schema e http://localhost/redoc serve o ReDoc. O backend recarrega alterações em `backend/app` e `backend/commands`. Para atualizar o frontend, repetir o comando com `--build` (para HMR, usar o Vite local descrito acima).
+In development, http://localhost/openapi.json serves the schema and http://localhost/redoc serves ReDoc. The backend reloads changes in `backend/app` and `backend/commands`. To update the frontend, run the command again with `--build` (for HMR, use the local Vite setup described above).
 
-Em produção, `ENABLE_DOCS=false` desativa a documentação no FastAPI e o Nginx bloqueia essas rotas. `/api` continua acessível pelo Nginx para a UI gerar passwords. Há um limite de 5 pedidos/segundo por IP, com burst de 10 e resposta 429 ao excedê-lo.
+In production, `ENABLE_DOCS=false` disables FastAPI documentation, and Nginx blocks those routes. `/api` remains accessible through Nginx so the UI can generate passwords. Requests are limited to 5 per second per IP, with a burst of 10 and a 429 response when exceeded.
 
-`compose.yaml` é desenvolvimento. `compose.prod.yaml` é produção. São independentes, sem overrides nem `extends`.
+`compose.yaml` is for development. `compose.prod.yaml` is for production. They are independent, with no overrides or `extends`.
 
-Para instalar na VPS ao lado do MidnightLibrary, seguir [ops/DEPLOY.md](ops/DEPLOY.md). Inclui a criação da rede e as alterações necessárias no Nginx existente. Fazer clone e arrancar o DevToolBox não publica automaticamente o subdomínio.
+To deploy on the VPS alongside MidnightLibrary, follow [ops/DEPLOY.md](ops/DEPLOY.md). It covers network creation and the required changes to the existing Nginx configuration. Cloning and starting DevToolBox does not automatically make the subdomain publicly accessible.
 
-O CLI original continua disponível com `cd backend && uv run python main.py`; esse fluxo ainda grava ficheiros em `backend/passwords/`, ignorados pelo Git.
+The original CLI remains available through `cd backend && uv run python main.py`; this flow still writes files to `backend/passwords/`, which Git ignores.
 
-## Referências
+## References
 
-- [shadcn/ui: instalação](https://ui.shadcn.com/docs/installation)
-- [FastAPI em Docker](https://fastapi.tiangolo.com/deployment/docker/)
+- [shadcn/ui installation](https://ui.shadcn.com/docs/installation)
+- [FastAPI in Docker](https://fastapi.tiangolo.com/deployment/docker/)
