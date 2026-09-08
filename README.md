@@ -49,12 +49,12 @@ cd frontend/DevToolBox && npm run build
 
 ## Docker Compose: dev e produção
 
-Há dois serviços: `backend` (FastAPI) e `nginx` (serve o build do frontend e faz reverse proxy para a API). Só publica `127.0.0.1:80`; o backend não publica portas no host em nenhum ambiente.
+Há dois serviços: `backend` (FastAPI) e `nginx` (serve o build do frontend e faz reverse proxy para a API). Em dev, o Nginx publica `127.0.0.1:80`. Em produção, nenhum serviço publica portas; só o Nginx participa na rede externa `vps-proxy`. O backend fica na rede própria do projeto.
 
 | Ambiente | Comando | Frontend | Swagger |
 | --- | --- | --- | --- |
 | Dev | `docker compose up -d --build` | http://localhost | http://localhost/docs |
-| Produção | `docker compose -f compose.prod.yaml up -d --build` | http://localhost | Desativado (404) |
+| Produção | `docker compose -p devtoolbox -f compose.prod.yaml up -d --build` | https://devtoolbox.pedrocrlx.pt após integração | Desativado (404) |
 
 Em dev, http://localhost/openapi.json serve o schema e http://localhost/redoc serve o ReDoc. O backend recarrega alterações em `backend/app` e `backend/commands`. Para atualizar o frontend, repetir o comando com `--build` (para HMR, usar o Vite local descrito acima).
 
@@ -62,21 +62,7 @@ Em produção, `ENABLE_DOCS=false` desativa a documentação no FastAPI e o Ngin
 
 `compose.yaml` é desenvolvimento. `compose.prod.yaml` é produção. São independentes, sem overrides nem `extends`.
 
-Dev e produção usam a mesma porta e devem correr alternadamente. Parar o ambiente atual antes de mudar:
-
-```sh
-docker compose down
-# ou
-docker compose -f compose.prod.yaml down
-```
-
-Na VPS, esta configuração fica acessível apenas no próprio servidor, não pelo IP público. Para aceder a partir do teu computador sem a publicar, usar um túnel SSH:
-
-```sh
-ssh -L 8080:127.0.0.1:80 utilizador@vps
-```
-
-Depois abrir http://localhost:8080 no computador. Uma publicação futura com domínio e HTTPS exige configurar explicitamente a entrada pública; não está ativada nestes ficheiros.
+Para instalar na VPS ao lado do MidnightLibrary, seguir [ops/DEPLOY.md](ops/DEPLOY.md). Inclui a criação da rede e as alterações necessárias no Nginx existente. Fazer clone e arrancar o DevToolBox não publica automaticamente o subdomínio.
 
 O CLI original continua disponível com `cd backend && uv run python main.py`; esse fluxo ainda grava ficheiros em `backend/passwords/`, ignorados pelo Git.
 

@@ -13,8 +13,16 @@ services:
   nginx:
     build: ./frontend/DevToolBox
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:80:80"
+    networks:
+      default:
+      proxy:
+        aliases:
+          - devtoolbox-web
     depends_on:
       backend:
         condition: service_healthy
+
+networks:
+  proxy:
+    external: true
+    name: vps-proxy

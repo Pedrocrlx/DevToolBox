@@ -21,7 +21,7 @@ down:
 	docker compose down
 
 prod-up:
-	docker compose -f compose.prod.yaml up -d --build
+	docker compose -p devtoolbox -f compose.prod.yaml up -d --build
 
 prod-down:
-	docker compose -f compose.prod.yaml down
+	docker compose -p devtoolbox -f compose.prod.yaml down
