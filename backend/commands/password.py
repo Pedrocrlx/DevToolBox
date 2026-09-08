@@ -1,19 +1,19 @@
-"""Password generation module/command."""
+"""Random password generation and the interactive CLI command."""
 
 import secrets
 import string
 from datetime import UTC, datetime
 
 
-def generate_password(length: int, digits: str, letters: str, punctuation: str) -> str:
-    """Generate a password using the selected character sets."""
+def generate_random_password(length: int, digits: str, letters: str, punctuation: str) -> str:
+    """Return a random password from the supplied character sets."""
     return "".join(
         secrets.choice(digits + letters + punctuation) for _ in range(length)
     )
 
 
-def password_options() -> tuple[str, str, str]:
-    """Prompt the user for password options and return them as a tuple."""
+def prompt_character_options() -> tuple[str, str, str]:
+    """Ask which character types to include and return the y/n answers."""
 
     digits = input("Include digits ? (y/n) ")
     letters = input("Include letters ? (y/n) ")
@@ -22,11 +22,11 @@ def password_options() -> tuple[str, str, str]:
     return digits, letters, punctuation
 
 
-def password_generator() -> str | None:
-    """Generate a password based on the user's options and print it."""
+def run_password_cli() -> None:
+    """Prompt for options, validate answers, generate a password and save it to a file."""
 
     length = int(input("Length ? default = 12 ") or 12)
-    digits, letters, punctuation = password_options()
+    digits, letters, punctuation = prompt_character_options()
 
     while True:
         options = [digits, letters, punctuation]
@@ -36,7 +36,7 @@ def password_generator() -> str | None:
             print("Please answer 'y' to at least one option. ")
         else:
             break
-        digits, letters, punctuation = password_options()
+        digits, letters, punctuation = prompt_character_options()
 
     if digits != "y":
         digits = ""
@@ -54,14 +54,14 @@ def password_generator() -> str | None:
         punctuation = string.punctuation
 
     print(f"Generating password of length {length}...")
-    password = generate_password(length, digits, letters, punctuation)
+    password = generate_random_password(length, digits, letters, punctuation)
 
 
-    file_name_counting = input("Filename ? default = password ") or "password"
+    filename = input("Filename ? default = password ") or "password"
     # Writing plain text to a file
-    with open(f"passwords/{file_name_counting}.txt", "w", encoding="utf-8") as password_file:
+    with open(f"passwords/{filename}.txt", "w", encoding="utf-8") as password_file:
         time = datetime.now(UTC)
         password_file.write(f"Password generated at {time}\n")
         password_file.write(f"Password: {password}")
 
-    return print(f"Password saved to passwords/{file_name_counting}.txt")
+    print(f"Password saved to passwords/{filename}.txt")

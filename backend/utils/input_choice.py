@@ -1,4 +1,4 @@
-from commands.password import password_generator
+from commands.password import run_password_cli
 
 
 def user_choice() -> int:
@@ -20,7 +20,7 @@ def handle_menu_choice(option_selected: int) -> None:
     match option_selected:
         case 1:
             print("Password Generator selected! ")
-            password_generator()
+            run_password_cli()
         case 2:
             print("File Hash selected !")
         case 3:

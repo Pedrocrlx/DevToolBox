@@ -7,7 +7,7 @@ from typing import Self
 from fastapi import FastAPI, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from commands.password import generate_password
+from commands.password import generate_random_password
 
 enable_docs = os.getenv("ENABLE_DOCS", "true").lower() == "true"
 app = FastAPI(
@@ -48,7 +48,7 @@ def health() -> dict[str, str]:
 def create_password(options: PasswordRequest, response: Response) -> PasswordResponse:
     response.headers["Cache-Control"] = "no-store"
     return PasswordResponse(
-        password=generate_password(
+        password=generate_random_password(
             options.length,
             string.digits if options.digits else "",
             string.ascii_letters if options.letters else "",
